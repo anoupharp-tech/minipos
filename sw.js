@@ -4,7 +4,7 @@
  * Offline: Sales queued in IndexedDB, synced on reconnect
  */
 
-const CACHE_NAME = 'minipos-v1.0.2';
+const CACHE_NAME = 'minipos-v1.0.3';
 const API_ORIGIN = 'script.google.com';
 
 const STATIC_ASSETS = [
@@ -114,21 +114,18 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // App shell: cache-first, then network, then cache anything new
+  // App shell: network-first, cache fallback
   event.respondWith(
-    caches.match(request).then(cached => {
-      if (cached) return cached;
-      return fetch(request).then(response => {
-        if (response.ok) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
-        }
-        return response;
-      }).catch(() => {
-        // Fallback to index.html for navigation requests
-        if (request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
+    fetch(request).then(response => {
+      if (response.ok) {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+      }
+      return response;
+    }).catch(() => {
+      return caches.match(request).then(cached => {
+        if (cached) return cached;
+        if (request.mode === 'navigate') return caches.match('./index.html');
         return new Response('', { status: 503 });
       });
     })
