@@ -39,6 +39,7 @@ function doGet(e) {
 
     switch (action) {
       case 'validateToken':      return respondOk(handleValidateToken(params, user));
+      case 'login':             return respondOk(handleLogin(params));
       case 'getProducts':        return respondOk(handleGetProducts(params, user));
       case 'getProduct':         return respondOk(handleGetProduct(params, user));
       case 'getProductByBarcode':return respondOk(handleGetProductByBarcode(params, user));

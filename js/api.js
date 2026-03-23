@@ -78,7 +78,7 @@ const API = (() => {
 
   // ─── Auth ─────────────────────────────────────────────
   const auth = {
-    login: (username, password) => post('login', { username, password }),
+    login: (username, password) => get('login', { username, password }),
     logout: () => post('logout', {}),
     validateToken: () => get('validateToken'),
   };
