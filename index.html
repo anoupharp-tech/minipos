@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#4f46e5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="MiniPOS">
+  <meta name="description" content="Modern Minimart Point of Sale System">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <title>MiniPOS</title>
+
+  <!-- Google Fonts: Noto Sans for Lao/Thai/ZH/EN support -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Lao:wght@400;600;700&family=Noto+Sans+Thai:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/pos.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/print.css">
+  <link rel="stylesheet" href="css/receipt.css">
+
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" defer></script>
+</head>
+<body>
+
+  <!-- ===== OFFLINE BANNER ===== -->
+  <div id="offline-banner" class="offline-banner hidden">
+    <span class="offline-icon">⚡</span>
+    <span data-i18n="offline_mode">Offline Mode — sales will sync when online</span>
+  </div>
+
+  <!-- ===== LOGIN SCREEN ===== -->
+  <div id="login-screen" class="login-screen hidden">
+    <div class="login-card">
+      <div class="login-logo">
+        <img src="assets/images/logo-placeholder.png" alt="Logo" id="login-logo-img" onerror="this.style.display='none'">
+        <h1 class="login-title" id="login-store-name">MiniPOS</h1>
+      </div>
+      <form id="login-form" class="login-form" autocomplete="off">
+        <div class="form-group">
+          <label data-i18n="username">Username</label>
+          <input type="text" id="login-username" name="username" autocomplete="off" inputmode="text" required>
+        </div>
+        <div class="form-group">
+          <label data-i18n="password">Password</label>
+          <input type="password" id="login-password" name="password" autocomplete="off" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-full" id="login-btn">
+          <span data-i18n="login">Login</span>
+        </button>
+        <div id="login-error" class="login-error hidden"></div>
+      </form>
+      <div class="login-lang">
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="lo">ລາວ</button>
+        <button class="lang-btn" data-lang="th">ไทย</button>
+        <button class="lang-btn" data-lang="zh">中文</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MAIN APP SHELL ===== -->
+  <div id="app-shell" class="app-shell hidden">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <img src="assets/images/logo-placeholder.png" alt="Logo" class="sidebar-logo" id="sidebar-logo" onerror="this.style.display='none'">
+        <span class="sidebar-store-name" id="sidebar-store-name">MiniPOS</span>
+        <button class="sidebar-close" id="sidebar-close-btn">✕</button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#/pos" class="nav-item active" data-route="/pos">
+          <span class="nav-icon">🛒</span>
+          <span class="nav-label" data-i18n="nav_pos">Point of Sale</span>
+        </a>
+        <a href="#/products" class="nav-item admin-only" data-route="/products">
+          <span class="nav-icon">📦</span>
+          <span class="nav-label" data-i18n="nav_products">Products</span>
+        </a>
+        <a href="#/categories" class="nav-item admin-only" data-route="/categories">
+          <span class="nav-icon">🏷️</span>
+          <span class="nav-label" data-i18n="nav_categories">Categories</span>
+        </a>
+        <a href="#/stock" class="nav-item admin-only" data-route="/stock">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label" data-i18n="nav_stock">Stock</span>
+        </a>
+        <a href="#/barcodes" class="nav-item admin-only" data-route="/barcodes">
+          <span class="nav-icon">🔢</span>
+          <span class="nav-label" data-i18n="nav_barcodes">Barcodes</span>
+        </a>
+        <a href="#/reports" class="nav-item admin-only" data-route="/reports">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label" data-i18n="nav_reports">Reports</span>
+        </a>
+        <a href="#/users" class="nav-item admin-only" data-route="/users">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label" data-i18n="nav_users">Users</span>
+        </a>
+        <a href="#/settings" class="nav-item admin-only" data-route="/settings">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label" data-i18n="nav_settings">Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar" id="user-avatar">A</div>
+          <div class="user-details">
+            <div class="user-name" id="sidebar-user-name">Admin</div>
+            <div class="user-role" id="sidebar-user-role">Administrator</div>
+          </div>
+        </div>
+        <button class="btn-logout" id="logout-btn" title="Logout">⏻</button>
+      </div>
+    </aside>
+
+    <!-- Sidebar overlay -->
+    <div id="sidebar-overlay" class="sidebar-overlay hidden"></div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Topbar -->
+      <header class="topbar">
+        <button class="topbar-menu-btn" id="menu-btn">☰</button>
+        <div class="topbar-title" id="topbar-title" data-i18n="nav_pos">Point of Sale</div>
+        <div class="topbar-actions">
+          <!-- Low stock alert -->
+          <button class="topbar-alert hidden" id="low-stock-alert" title="Low Stock Alert">
+            ⚠️ <span id="low-stock-count">0</span>
+          </button>
+          <!-- Language switcher -->
+          <div class="lang-switcher">
+            <button class="lang-current" id="lang-current-btn">EN ▾</button>
+            <div class="lang-dropdown hidden" id="lang-dropdown">
+              <button class="lang-opt" data-lang="en">English</button>
+              <button class="lang-opt" data-lang="lo">ລາວ</button>
+              <button class="lang-opt" data-lang="th">ภาษาไทย</button>
+              <button class="lang-opt" data-lang="zh">中文</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- View Container -->
+      <div id="view-container" class="view-container">
+        <!-- Views are injected here by router -->
+        <div class="loading-screen" id="initial-loader">
+          <div class="spinner"></div>
+          <p data-i18n="loading">Loading...</p>
+        </div>
+      </div>
+    </main>
+
+  </div><!-- end app-shell -->
+
+  <!-- ===== TOAST NOTIFICATIONS ===== -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ===== RECEIPT PRINT AREA ===== -->
+  <div id="receipt-print-area" class="receipt-print-area" style="display:none;">
+    <div id="receipt-content"></div>
+  </div>
+
+  <!-- ===== BARCODE PRINT AREA ===== -->
+  <div id="barcode-print-area" class="barcode-print-area" style="display:none;">
+    <div id="barcode-labels-content"></div>
+  </div>
+
+  <!-- ===== GLOBAL MODAL ===== -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div id="modal-box" class="modal-box">
+      <div class="modal-header">
+        <h3 id="modal-title"></h3>
+        <button class="modal-close" id="modal-close-btn">✕</button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
+      <div id="modal-footer" class="modal-footer"></div>
+    </div>
+  </div>
+
+  <!-- ===== CONFIRM DIALOG ===== -->
+  <div id="confirm-overlay" class="modal-overlay hidden">
+    <div class="modal-box modal-sm">
+      <div class="modal-header">
+        <h3 id="confirm-title" data-i18n="confirm">Confirm</h3>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-message"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="confirm-cancel-btn" data-i18n="cancel">Cancel</button>
+        <button class="btn btn-danger" id="confirm-ok-btn" data-i18n="confirm_delete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CAMERA SCANNER MODAL ===== -->
+  <div id="scanner-modal" class="modal-overlay hidden">
+    <div class="modal-box modal-sm">
+      <div class="modal-header">
+        <h3 data-i18n="scan_barcode">Scan Barcode</h3>
+        <button class="modal-close" id="scanner-modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="camera-scanner-container"></div>
+        <p class="scan-hint" data-i18n="scan_hint">Point camera at barcode</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PAYMENT MODAL ===== -->
+  <div id="payment-modal" class="modal-overlay hidden">
+    <div class="modal-box payment-modal-box">
+      <div class="modal-header">
+        <h3 data-i18n="payment">Payment</h3>
+        <button class="modal-close" id="payment-modal-close">✕</button>
+      </div>
+      <div class="modal-body" id="payment-modal-body">
+        <!-- Rendered by pos.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RECEIPT MODAL ===== -->
+  <div id="receipt-modal" class="modal-overlay hidden">
+    <div class="modal-box receipt-modal-box">
+      <div class="modal-header">
+        <h3 data-i18n="receipt">Receipt</h3>
+        <button class="modal-close" id="receipt-modal-close">✕</button>
+      </div>
+      <div class="modal-body" id="receipt-modal-body">
+        <!-- Rendered by receipt.js -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="receipt-new-sale-btn" data-i18n="new_sale">New Sale</button>
+        <button class="btn btn-primary" id="receipt-print-btn">
+          <span>🖨️</span> <span data-i18n="print_receipt">Print Receipt</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App JS modules (order matters) -->
+  <script src="js/state.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/translations.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/sync.js"></script>
+  <script src="js/scanner.js"></script>
+  <script src="js/barcode.js"></script>
+  <script src="js/receipt.js"></script>
+  <script src="js/router.js"></script>
+
+  <!-- Views -->
+  <script src="js/views/login.js"></script>
+  <script src="js/views/pos.js"></script>
+  <script src="js/views/products.js"></script>
+  <script src="js/views/categories.js"></script>
+  <script src="js/views/stock.js"></script>
+  <script src="js/views/barcodes.js"></script>
+  <script src="js/views/reports.js"></script>
+  <script src="js/views/settings.js"></script>
+  <script src="js/views/users.js"></script>
+
+  <!-- Entry point (last) -->
+  <script src="js/app.js"></script>
+
+</body>
+</html>

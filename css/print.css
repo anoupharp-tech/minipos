@@ -1,0 +1,131 @@
+/* ============================================================
+   MiniPOS - print.css
+   Barcode label printing: 30x40mm and 40x60mm sizes
+   ============================================================ */
+
+/* ─── Label sizes (set via JS CSS variable) ──────────────── */
+:root {
+  --label-width: 40mm;
+  --label-height: 60mm;
+}
+
+/* ─── Screen preview of label ────────────────────────────── */
+.barcode-label-preview {
+  width: var(--label-width);
+  height: var(--label-height);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3mm;
+  gap: 1mm;
+  background: #fff;
+  font-family: 'Noto Sans', sans-serif;
+}
+
+.barcode-label-store {
+  font-size: 7pt;
+  font-weight: 700;
+  text-align: center;
+  color: #000;
+  line-height: 1.2;
+}
+
+.barcode-label-name {
+  font-size: 7pt;
+  font-weight: 600;
+  text-align: center;
+  color: #111;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.barcode-label-svg {
+  max-width: 100%;
+}
+
+.barcode-label-price {
+  font-size: 10pt;
+  font-weight: 700;
+  text-align: center;
+  color: #000;
+}
+
+/* ─── Print container (hidden on screen) ─────────────────── */
+.barcode-print-area {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Print label sheet layout ───────────────────────────── */
+.barcode-labels-sheet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.barcode-label-print {
+  width: var(--label-width);
+  height: var(--label-height);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3mm 2mm;
+  gap: 1mm;
+  background: #fff;
+  font-family: 'Noto Sans', sans-serif;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* ─── Print @media ───────────────────────────────────────── */
+@media print {
+
+  /* Hide everything except the barcode print area */
+  body > *:not(.barcode-print-area):not(.receipt-print-area) {
+    display: none !important;
+  }
+  .barcode-print-area {
+    position: static !important;
+    left: auto !important;
+    display: block !important;
+  }
+  .receipt-print-area {
+    display: block !important;
+  }
+
+  /* Page setup for label printing */
+  @page {
+    size: var(--label-width) var(--label-height);
+    margin: 0;
+  }
+
+  /* When printing multiple labels, allow multiple per page for A4 */
+  .print-size-a4 @page {
+    size: A4 portrait;
+    margin: 5mm;
+  }
+
+  .barcode-label-print {
+    width: var(--label-width);
+    height: var(--label-height);
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .barcode-label-store { font-size: 7pt; }
+  .barcode-label-name  { font-size: 7pt; }
+  .barcode-label-price { font-size: 10pt; }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+  }
+}
