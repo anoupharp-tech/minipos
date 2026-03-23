@@ -41,6 +41,7 @@ const LoginView = (() => {
       if (url) {
         API.setBaseUrl(url);
         if (statusEl) { statusEl.textContent = '✅ Saved!'; statusEl.style.color = '#16a34a'; }
+        document.getElementById('login-error')?.classList.add('hidden');
       } else {
         if (statusEl) { statusEl.textContent = '❌ Please enter a URL'; statusEl.style.color = '#dc2626'; }
       }
