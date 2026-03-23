@@ -4,7 +4,7 @@
  * Offline: Sales queued in IndexedDB, synced on reconnect
  */
 
-const CACHE_NAME = 'minipos-v1.0.0';
+const CACHE_NAME = 'minipos-v1.0.2';
 const API_ORIGIN = 'script.google.com';
 
 const STATIC_ASSETS = [
