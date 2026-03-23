@@ -9,12 +9,6 @@
 
   // ─── 1. Register Service Worker ─────────────────────────
   if ('serviceWorker' in navigator) {
-    // Unregister any old SW first to ensure fresh start
-    const regs = await navigator.serviceWorker.getRegistrations();
-    for (const reg of regs) { await reg.unregister(); }
-    // Clear all caches
-    const keys = await caches.keys();
-    await Promise.all(keys.map(k => caches.delete(k)));
     try {
       const reg = await navigator.serviceWorker.register('./sw.js');
       console.log('[App] Service Worker registered:', reg.scope);

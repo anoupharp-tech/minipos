@@ -12,6 +12,31 @@
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
   <title>MiniPOS</title>
 
+  <!-- Nuclear SW/cache cleanup: runs BEFORE any other JS loads -->
+  <script>
+  (function(){
+    if('serviceWorker' in navigator){
+      var swCleared = sessionStorage.getItem('sw_cleared_v4');
+      if(!swCleared){
+        navigator.serviceWorker.getRegistrations().then(function(regs){
+          var hadSW = regs.length > 0;
+          var p = regs.map(function(r){ return r.unregister(); });
+          return Promise.all(p).then(function(){ return hadSW; });
+        }).then(function(hadSW){
+          return caches.keys().then(function(keys){
+            return Promise.all(keys.map(function(k){ return caches.delete(k); })).then(function(){
+              return hadSW || keys.length > 0;
+            });
+          });
+        }).then(function(needReload){
+          sessionStorage.setItem('sw_cleared_v4','1');
+          if(needReload){ window.location.reload(); }
+        });
+      }
+    }
+  })();
+  </script>
+
   <!-- Google Fonts: Noto Sans for Lao/Thai/ZH/EN support -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
