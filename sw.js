@@ -4,7 +4,7 @@
  * Offline: Sales queued in IndexedDB, synced on reconnect
  */
 
-const CACHE_NAME = 'minipos-v1.0.3';
+const CACHE_NAME = 'minipos-v1.0.4';
 const API_ORIGIN = 'script.google.com';
 
 const STATIC_ASSETS = [
@@ -84,16 +84,8 @@ self.addEventListener('fetch', event => {
   // Skip non-GET for non-API (forms etc handled by app)
   if (request.method !== 'GET' && !url.hostname.includes(API_ORIGIN)) return;
 
-  // GAS API: network-only (no caching of API responses)
+  // GAS API: do not intercept, let browser handle directly
   if (url.hostname.includes(API_ORIGIN)) {
-    event.respondWith(
-      fetch(request).catch(() =>
-        new Response(
-          JSON.stringify({ status: 'error', error: 'Offline - no network', code: 503 }),
-          { headers: { 'Content-Type': 'application/json' } }
-        )
-      )
-    );
     return;
   }
 
