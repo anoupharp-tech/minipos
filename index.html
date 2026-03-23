@@ -65,7 +65,7 @@
           <div style="margin-top:8px;display:flex;gap:8px;">
             <input type="url" id="login-api-url" placeholder="https://script.google.com/macros/s/.../exec"
               style="flex:1;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
-            <button type="button" id="login-save-api" class="btn btn-primary" style="white-space:nowrap;padding:8px 12px;font-size:13px;">Save</button>
+            <button type="button" onclick="(function(){var u=document.getElementById('login-api-url').value.trim();if(u){localStorage.setItem('pos_api_url',u);document.getElementById('login-error').classList.add('hidden');document.getElementById('login-api-status').textContent='✅ Saved! Now login.';document.getElementById('login-api-status').style.color='#16a34a';}else{document.getElementById('login-api-status').textContent='❌ Enter URL first';}})()" class="btn btn-primary" style="white-space:nowrap;padding:8px 12px;font-size:13px;">Save</button>
           </div>
           <div id="login-api-status" style="font-size:12px;margin-top:4px;color:#6b7280;"></div>
         </details>
