@@ -30,6 +30,22 @@ const LoginView = (() => {
   }
 
   function init() {
+    // Load saved API URL into the field
+    const savedUrl = API.getBaseUrl();
+    const apiInput = document.getElementById('login-api-url');
+    if (apiInput && savedUrl) apiInput.value = savedUrl;
+
+    document.getElementById('login-save-api')?.addEventListener('click', () => {
+      const url = document.getElementById('login-api-url')?.value.trim();
+      const statusEl = document.getElementById('login-api-status');
+      if (url) {
+        API.setBaseUrl(url);
+        if (statusEl) { statusEl.textContent = '✅ Saved!'; statusEl.style.color = '#16a34a'; }
+      } else {
+        if (statusEl) { statusEl.textContent = '❌ Please enter a URL'; statusEl.style.color = '#dc2626'; }
+      }
+    });
+
     const form = document.getElementById('login-form');
     const errorEl = document.getElementById('login-error');
 
